@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mister RP — Your AI Property Agent</title>
+<meta name="description" content="Mister RP reads HDB and URA market data in real time so you can ask a straight question about a flat or condo and get a straight answer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #0B1E33;
+    --ink-soft: #16293F;
+    --paper: #EEF0EE;
+    --paper-raise: #E4E7E2;
+    --slate: #4B5A6B;
+    --slate-light: #7C8A99;
+    --brass: #A9822F;
+    --brass-light: #C9A860;
+    --green: #2F6B4F;
+    --line: rgba(11,30,51,0.13);
+    --line-soft: rgba(11,30,51,0.07);
+    --white: #FBFBFA;
+    --shadow: 0 1px 2px rgba(11,30,51,0.06), 0 8px 24px rgba(11,30,51,0.05);
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+  @media (max-width: 640px){ .wrap{ padding: 0 20px; } }
+
+  a{ color: inherit; }
+
+  h1,h2,h3{ font-family: var(--serif); font-weight: 600; line-height: 1.12; letter-spacing: -0.01em; color: var(--ink); }
+
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 500;
+  }
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(238,240,238,0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    height: 72px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family: var(--serif); font-weight:700; font-size:1.25rem;
+    text-decoration:none; color: var(--ink);
+  }
+  .brand-mark{
+    width: 28px; height: 28px; border-radius: 3px;
+    background: linear-gradient(155deg, var(--ink) 0%, var(--ink-soft) 60%);
+    position: relative; flex-shrink:0;
+  }
+  .brand-mark::after{
+    content:"";
+    position:absolute; left:50%; top:50%;
+    width: 9px; height: 9px;
+    border: 2px solid var(--brass-light);
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+  }
+  nav.links{ display:flex; gap: 32px; align-items:center; }
+  nav.links a{
+    font-size: 0.92rem; font-weight: 500; text-decoration:none; color: var(--slate);
+    transition: color 0.15s ease;
+  }
+  nav.links a:hover{ color: var(--ink); }
+  .btn-cta{
+    font-size: 0.88rem; font-weight: 600; text-decoration:none;
+    background: var(--ink); color: var(--white);
+    padding: 10px 20px; border-radius: 4px;
+    transition: background 0.18s ease, transform 0.18s ease;
+    display:inline-block;
+  }
+  .btn-cta:hover{ background: var(--ink-soft); transform: translateY(-1px); }
+  .nav-toggle{ display:none; background:none; border:none; cursor:pointer; }
+
+  @media (max-width: 860px){
+    nav.links{ display:none; }
+    .nav-toggle{ display:block; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding: 96px 0 56px; }
+  .hero .eyebrow{ margin-bottom: 20px; display:block; }
+  .hero h1{
+    font-size: clamp(2.3rem, 4.6vw, 3.6rem);
+    max-width: 15ch;
+    margin-bottom: 24px;
+  }
+  .hero h1 em{ font-style: italic; color: var(--brass); }
+  .hero p.lede{
+    font-size: 1.15rem; color: var(--slate); max-width: 46ch; margin-bottom: 36px;
+  }
+  .hero-ctas{ display:flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+  .btn-ghost{
+    font-size: 0.92rem; font-weight:600; text-decoration:none; color: var(--ink);
+    border: 1px solid var(--line); padding: 12px 22px; border-radius: 4px;
+    transition: border-color 0.18s ease, background 0.18s ease;
+  }
+  .btn-ghost:hover{ border-color: var(--ink); background: rgba(11,30,51,0.03); }
+  .btn-primary{
+    font-size: 0.92rem; font-weight:600; text-decoration:none; color: var(--white);
+    background: var(--ink); padding: 12px 22px; border-radius: 4px;
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+  .btn-primary:hover{ background: var(--ink-soft); transform: translateY(-1px); }
+
+  /* ---------- TICKER (signature element) ---------- */
+  .ticker-band{
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-band::before, .ticker-band::after{
+    content:""; position:absolute; top:0; bottom:0; width: 60px; z-index:2;
+  }
+  .ticker-band::before{ left:0; background: linear-gradient(90deg, var(--ink), transparent); }
+  .ticker-band::after{ right:0; background: linear-gradient(270deg, var(--ink), transparent); }
+  .ticker-track{
+    display:flex; width: max-content;
+    animation: ticker-scroll 72s linear infinite;
+  }
+  /* Track holds two identical copies of the list. Animating from -50% to 0
+     slides the content rightward, so items read left-to-right, and the loop
+     stays seamless because copy #2 starts exactly where copy #1 ends. */
+  @keyframes ticker-scroll{
+    from{ transform: translateX(-50%); }
+    to{ transform: translateX(0); }
+  }
+  .ticker-item{
+    font-family: var(--mono); font-size: 0.82rem; color: rgba(255,255,255,0.82);
+    display:flex; align-items:center; gap: 10px;
+    padding: 14px 28px; white-space:nowrap;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .ticker-item .loc{ color: #fff; font-weight: 500; }
+  .ticker-item .up{ color: #6FCF9E; }
+  .ticker-item .down{ color: #E28B8B; }
+  .ticker-note{
+    text-align:center; font-family: var(--mono); font-size: 0.68rem;
+    color: var(--slate-light); letter-spacing:0.05em; padding: 10px 0;
+  }
+
+  /* ---------- SECTION SCAFFOLDING ---------- */
+  section{ padding: 88px 0; border-bottom: 1px solid var(--line-soft); }
+  section:last-of-type{ border-bottom: none; }
+  .section-head{ max-width: 60ch; margin-bottom: 52px; }
+  .section-head .eyebrow{ margin-bottom: 14px; }
+  .section-head h2{ font-size: clamp(1.7rem, 3vw, 2.3rem); margin-bottom: 16px; }
+  .section-head p{ color: var(--slate); font-size: 1.02rem; }
+
+  .reveal{ opacity:0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in{ opacity:1; transform: translateY(0); }
+
+  /* ---------- PROBLEM ---------- */
+  .problem-grid{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+  }
+  @media (max-width: 860px){ .problem-grid{ grid-template-columns: 1fr; gap: 32px; } }
+  .problem-item{ border-top: 2px solid var(--ink); padding-top: 18px; }
+  .problem-item .stat{
+    font-family: var(--mono); font-size: 2.1rem; color: var(--ink); font-weight: 500; display:block; margin-bottom: 10px;
+  }
+  .problem-item p{ color: var(--slate); font-size: 0.96rem; }
+
+  /* ---------- FEATURES ---------- */
+  .feature-grid{
+    display:grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line);
+  }
+  @media (max-width: 700px){ .feature-grid{ grid-template-columns: 1fr; } }
+  .feature-card{
+    background: var(--white); padding: 36px;
+    transition: background 0.2s ease;
+  }
+  .feature-card:hover{ background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
+  .feature-icon{
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--paper-raise);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 20px;
+  }
+  .feature-card h3{ font-size: 1.15rem; margin-bottom: 10px; }
+  .feature-card p{ color: var(--slate); font-size: 0.94rem; }
+
+  /* ---------- DEMO VIDEO ---------- */
+  .video-frame{
+    position: relative; width: 100%; aspect-ratio: 16/9;
+    background: var(--ink); border-radius: 6px; overflow:hidden;
+    box-shadow: var(--shadow);
+  }
+  .video-frame iframe{
+    position:absolute; inset:0; width:100%; height:100%; border:0;
+  }
+
+  /* ---------- FLOW DIAGRAM ---------- */
+  .flow-diagram{
+    background: var(--white); border: 1px solid var(--line); border-radius: 6px;
+    padding: 28px 20px 8px;
+  }
+  .flow-diagram svg{ width:100%; height:auto; display:block; }
+  .flow-caption{
+    margin-top: 20px; color: var(--slate); font-size: 0.9rem; max-width: 62ch;
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps{ display:flex; flex-direction:column; }
+  .step{
+    display:grid; grid-template-columns: 90px 1fr; gap: 28px;
+    padding: 32px 0; border-top: 1px solid var(--line);
+  }
+  .step:last-child{ border-bottom: 1px solid var(--line); }
+  .step-num{ font-family: var(--mono); font-size: 0.85rem; color: var(--brass); padding-top: 4px; }
+  .step h3{ font-size: 1.2rem; margin-bottom: 8px; }
+  .step p{ color: var(--slate); max-width: 62ch; }
+  .step-example{
+    margin-top: 14px; font-family: var(--mono); font-size: 0.82rem;
+    background: var(--paper-raise); border-left: 2px solid var(--brass);
+    padding: 10px 14px; color: var(--ink-soft); display:inline-block;
+  }
+  @media (max-width: 640px){
+    .step{ grid-template-columns: 1fr; gap: 8px; }
+  }
+
+  /* ---------- DATA / TRUST ---------- */
+  .data-panel{
+    background: var(--ink); color: var(--white);
+    border-radius: 6px; padding: 52px 48px;
+    display:grid; grid-template-columns: 1.1fr 1fr; gap: 48px;
+  }
+  @media (max-width: 860px){ .data-panel{ grid-template-columns: 1fr; padding: 36px 28px;} }
+  .data-panel h2{ color: var(--white); font-size: 1.9rem; margin-bottom: 16px; }
+  .data-panel p.lede{ color: rgba(255,255,255,0.72); max-width: 44ch; }
+  .source-list{ display:flex; flex-direction:column; gap: 22px; }
+  .source-item{ border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px; }
+  .source-item .tag{ font-family: var(--mono); font-size: 0.7rem; letter-spacing:0.1em; color: var(--brass-light); text-transform:uppercase; }
+  .source-item h4{ font-family: var(--serif); font-size: 1.05rem; margin: 6px 0 6px; color: var(--white); }
+  .source-item p{ color: rgba(255,255,255,0.65); font-size: 0.88rem; }
+  .disclaimer{
+    margin-top: 28px; font-size: 0.78rem; color: rgba(255,255,255,0.45);
+    border-top: 1px solid rgba(255,255,255,0.12); padding-top: 16px;
+  }
+
+  /* ---------- CTA / FOOTER ---------- */
+  .cta-final{
+    text-align:center; padding: 96px 0 64px;
+  }
+  .cta-final h2{ font-size: clamp(1.8rem, 4vw, 2.6rem); max-width: 22ch; margin: 0 auto 24px; }
+  .cta-final p{ color: var(--slate); max-width: 46ch; margin: 0 auto 32px; }
+  .cta-final .hero-ctas{ justify-content:center; }
+
+  footer{
+    border-top: 1px solid var(--line);
+    padding: 40px 0; font-size: 0.84rem; color: var(--slate-light);
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 12px;
+  }
+  footer a{ text-decoration:none; color: var(--slate); }
+  footer a:hover{ color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand">
+      <span class="brand-mark"></span>
+      Mister RP
+    </a>
+    <nav class="links">
+      <a href="#demo">Watch</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#features">What it does</a>
+      <a href="#data">Data &amp; trust</a>
+    </nav>
+    <!-- Swap the href below for your actual Telegram bot link, e.g. https://t.me/YourBotUsername -->
+    <a href="https://t.me/rpva_bot" class="btn-cta">Chat on Telegram</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero wrap">
+    <span class="eyebrow">AI PROPERTY AGENT · BUILT ON HDB &amp; URA DATA</span>
+    <h1>Ask a straight question about a flat or a condo. <em>Get a straight answer.</em></h1>
+    <p class="lede">Mister RP reads live HDB resale and URA private property data so you don't have to dig through portals and PDFs. Tell it what you're looking at — it tells you what the numbers actually say.</p>
+    <div class="hero-ctas">
+      <a href="https://t.me/rpva_bot" class="btn-primary">Chat with Mister RP</a>
+      <a href="#how-it-works" class="btn-ghost">See how it works</a>
+    </div>
+  </section>
+
+  <div class="ticker-band">
+    <div class="ticker-track" id="tickerTrack">
+      <!-- duplicated in JS for seamless loop -->
+    </div>
+  </div>
+  <p class="ticker-note wrap" id="tickerNote">Loading live figures from HDB &amp; URA data services…</p>
+
+  <section id="demo">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">MEET Mister RP</span>
+        <h2>The property agent that never says "let me check and get back to you."</h2>
+        <p>Home hunting in Singapore shouldn't mean juggling five tabs and a spreadsheet. Mister RP is the one conversation that replaces all of them.</p>
+      </div>
+      <div class="video-frame reveal">
+        <!--
+          Swap the src below for your Synthesia share/embed link, e.g.:
+          https://share.synthesia.io/embeds/videos/<your-video-id>
+        -->
+        <iframe
+          src="https://share.synthesia.io/embeds/videos/9cceea12-f032-40b8-9ae8-0e2e93a48119"
+          loading="lazy"
+          title="Mister RP product video"
+          allow="encrypted-media; fullscreen;"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">WHAT IT DOES</span>
+        <h2>One agent, four jobs your search usually needs a spreadsheet for.</h2>
+        <p>Each answer is grounded in the same data a property agent would pull — just faster, and without the sales pitch.</p>
+      </div>
+      <div class="feature-grid reveal">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Live market data</h3>
+          <p>Pulls current HDB resale transactions and URA private property records directly from official data services — no stale listings.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <h3>Plain-language answers</h3>
+          <p>Ask "is 650k fair for a 4-room in Tampines" the way you'd ask a person, not a filter panel.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Matched to your search</h3>
+          <p>Narrows results by town, flat type, budget, and tenure so you're comparing like with like.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📐</div>
+          <h3>Instant context</h3>
+          <p>Shows recent comparable transactions alongside every answer, so you can see the numbers behind the opinion.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">THE PROBLEM</span>
+        <h2>Property data in Singapore is public. Using it isn't easy.</h2>
+      </div>
+      <div class="problem-grid reveal">
+        <div class="problem-item">
+          <span class="stat">2 portals</span>
+          <p>HDB resale data and URA private property data live in separate systems with different formats and update schedules.</p>
+        </div>
+        <div class="problem-item">
+          <span class="stat">15th</span>
+          <p>URA private transaction data refreshes mid-month — by the time a listing feels "current," it may already be dated.</p>
+        </div>
+        <div class="problem-item">
+          <span class="stat">1 question</span>
+          <p>Most buyers just want to know if a specific asking price is reasonable — not how to run a datastore query.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">CONVERSATION FLOW</span>
+        <h2>What happens after you say hello.</h2>
+        <p>This is the actual decision tree running behind Mister RP's chat window — four intents, each routed to a different job.</p>
+      </div>
+      <div class="flow-diagram reveal">
+        <svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mister RP conversation flow diagram">
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="var(--slate-light)"></path>
+            </marker>
+          </defs>
+
+          <!-- trunk: start -> greeting -> question -->
+          <line x1="500" y1="40" x2="500" y2="70" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="500" y1="112" x2="500" y2="142" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="500" y1="184" x2="500" y2="214" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- branch spine -->
+          <line x1="500" y1="214" x2="500" y2="240" stroke="var(--slate-light)" stroke-width="1.5"/>
+          <line x1="130" y1="240" x2="870" y2="240" stroke="var(--slate-light)" stroke-width="1.5"/>
+          <line x1="130" y1="240" x2="130" y2="266" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="377" y1="240" x2="377" y2="266" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="623" y1="240" x2="623" y2="266" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="870" y1="240" x2="870" y2="266" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- column drops: intent -> action -->
+          <line x1="130" y1="308" x2="130" y2="338" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="377" y1="308" x2="377" y2="338" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="623" y1="308" x2="623" y2="338" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="870" y1="308" x2="870" y2="338" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- action -> outcome -->
+          <line x1="130" y1="380" x2="130" y2="410" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="377" y1="380" x2="377" y2="410" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <line x1="623" y1="380" x2="623" y2="410" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Start -->
+          <rect x="450" y="14" width="100" height="26" rx="13" fill="var(--ink)"></rect>
+          <text x="500" y="31" text-anchor="middle" class="flow-txt-inv">Start</text>
+
+          <!-- Greeting -->
+          <rect x="415" y="72" width="170" height="40" rx="6" fill="var(--white)" stroke="var(--line)"></rect>
+          <text x="500" y="97" text-anchor="middle" class="flow-txt">Greeting</text>
+
+          <!-- Question -->
+          <rect x="330" y="144" width="340" height="40" rx="6" fill="var(--white)" stroke="var(--line)"></rect>
+          <text x="500" y="169" text-anchor="middle" class="flow-txt">"What can I help you with?"</text>
+
+          <!-- Intent row -->
+          <rect x="65" y="266" width="130" height="42" rx="6" fill="var(--ink)"></rect>
+          <text x="130" y="292" text-anchor="middle" class="flow-txt-inv flow-bold">Browse</text>
+
+          <rect x="312" y="266" width="130" height="42" rx="6" fill="var(--ink)"></rect>
+          <text x="377" y="292" text-anchor="middle" class="flow-txt-inv flow-bold">Property Info</text>
+
+          <rect x="558" y="266" width="130" height="42" rx="6" fill="var(--ink)"></rect>
+          <text x="623" y="292" text-anchor="middle" class="flow-txt-inv flow-bold">Book Viewing</text>
+
+          <rect x="805" y="266" width="130" height="42" rx="6" fill="var(--ink)"></rect>
+          <text x="870" y="292" text-anchor="middle" class="flow-txt-inv flow-bold">Help</text>
+
+          <!-- Action row -->
+          <rect x="65" y="338" width="130" height="42" rx="6" fill="var(--white)" stroke="var(--brass)" stroke-width="1.5"></rect>
+          <text x="130" y="364" text-anchor="middle" class="flow-txt">List homes</text>
+
+          <rect x="312" y="338" width="130" height="42" rx="6" fill="var(--white)" stroke="var(--brass)" stroke-width="1.5"></rect>
+          <text x="377" y="364" text-anchor="middle" class="flow-txt">Show details</text>
+
+          <rect x="558" y="338" width="130" height="42" rx="6" fill="var(--white)" stroke="var(--brass)" stroke-width="1.5"></rect>
+          <text x="623" y="364" text-anchor="middle" class="flow-txt">Google Form</text>
+
+          <rect x="805" y="338" width="130" height="42" rx="6" fill="var(--white)" stroke="var(--line)"></rect>
+          <text x="870" y="358" text-anchor="middle" class="flow-txt flow-small">Live agent</text>
+          <text x="870" y="372" text-anchor="middle" class="flow-txt flow-small">hand-off</text>
+
+          <!-- Outcome row -->
+          <rect x="65" y="410" width="130" height="42" rx="6" fill="var(--paper-raise)"></rect>
+          <text x="130" y="436" text-anchor="middle" class="flow-txt flow-small">Ask filters</text>
+
+          <rect x="312" y="410" width="130" height="42" rx="6" fill="var(--paper-raise)"></rect>
+          <text x="377" y="431" text-anchor="middle" class="flow-txt flow-small">More</text>
+          <text x="377" y="445" text-anchor="middle" class="flow-txt flow-small">questions</text>
+
+          <rect x="558" y="410" width="130" height="42" rx="6" fill="var(--paper-raise)"></rect>
+          <text x="623" y="431" text-anchor="middle" class="flow-txt flow-small">AI scores</text>
+          <text x="623" y="445" text-anchor="middle" class="flow-txt flow-small">the lead</text>
+
+          <style>
+            .flow-txt{ font-family: var(--sans); font-size: 15px; fill: var(--ink); font-weight: 500; }
+            .flow-txt-inv{ font-family: var(--sans); font-size: 15px; fill: var(--white); font-weight: 500; }
+            .flow-bold{ font-weight: 600; }
+            .flow-small{ font-size: 13px; fill: var(--slate); font-weight: 500; }
+          </style>
+        </svg>
+      </div>
+      <p class="flow-caption reveal">Browse and Property Info both call the live HDB/URA data layer. Book Viewing hands off to a Google Form, then an AI lead-scoring step flags it for the team.</p>
+    </div>
+  </section>
+
+  <section id="data">
+    <div class="wrap">
+      <div class="data-panel reveal">
+        <div>
+          <span class="eyebrow" style="color:var(--brass-light)">DATA &amp; TRUST</span>
+          <h2>Built on official sources, not scraped listings.</h2>
+          <p class="lede">Mister RP doesn't guess at prices. Every figure it gives you traces back to a government data service, refreshed on the same schedule the agencies publish.</p>
+          <p class="disclaimer">Figures shown are illustrative and refresh on the same schedule as the underlying HDB/URA data services.</p>
+        </div>
+        <div class="source-list">
+          <div class="source-item">
+            <span class="tag">HDB</span>
+            <h4>Resale Flat Prices</h4>
+            <p>Public dataset via data.gov.sg, covering completed resale transactions by town, flat type and block.</p>
+          </div>
+          <div class="source-item">
+            <span class="tag">URA</span>
+            <h4>Private Residential Transactions</h4>
+            <p>URA Data Service API, covering private condo and landed property transactions, updated mid-month.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-final reveal" id="contact">
+    <span class="eyebrow">TRY IT NOW</span>
+    <h2 style="margin-top:16px;">Ask Mister RP a real property question.</h2>
+    <p>No more guessing. No more open tabs. Just ask Mister RP — it's live on Telegram right now.</p>
+    <div class="hero-ctas">
+      <a href="https://t.me/rpva_bot" class="btn-primary">Chat on Telegram</a>
+      <a href="https://github.com/your-team/Mister RP" class="btn-ghost">View the source</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <span>© 2026 Mister RP. Not a licensed property agency — always verify with a registered agent before transacting.</span>
+  <span>Data: HDB (data.gov.sg) · URA Data Service</span>
+</footer>
+
+<script src="ticker.js" defer></script>
+
+</body>
+</html>
