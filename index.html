@@ -267,6 +267,32 @@
   }
 
   /* ---------- HOW IT WORKS ---------- */
+  .how-it-works{ padding: 80px 0; background: rgba(255,255,255,0.62); }
+  .how-it-works .section-head{ margin: 0 auto 40px; text-align: center; max-width: 64ch; }
+  .section-subtitle{ color: var(--slate); margin-bottom: 0; }
+  .workflow-cards{
+    display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;
+  }
+  .workflow-card{
+    background: var(--white);
+    padding: 30px 24px;
+    border-radius: 18px;
+    border: 1px solid rgba(15,27,45,0.07);
+    box-shadow: 0 8px 24px rgba(11,30,51,0.06);
+    text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .workflow-card:hover{ transform: translateY(-6px); box-shadow: 0 14px 32px rgba(11,30,51,0.12); }
+  .workflow-card .icon{ font-size: 2.2rem; margin-bottom: 16px; }
+  .workflow-card h3{ color: var(--ink); margin-bottom: 12px; font-size: 1.15rem; }
+  .workflow-card p{ color: var(--slate); line-height: 1.6; font-size: 0.96rem; }
+  @media (max-width: 900px){
+    .workflow-cards{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 600px){
+    .workflow-cards{ grid-template-columns: 1fr; }
+  }
+
   .steps{ display:flex; flex-direction:column; }
   .step{
     display:grid; grid-template-columns: 90px 1fr; gap: 28px;
@@ -441,105 +467,38 @@
     </div>
   </section>
 
-  <section id="how-it-works">
+  <section class="how-it-works" id="how-it-works">
     <div class="wrap">
       <div class="section-head reveal">
-        <span class="eyebrow">CONVERSATION FLOW</span>
-        <h2>What happens after you say hello.</h2>
-        <p>This is the actual decision tree running behind Mister RP's chat window — four intents, each routed to a different job.</p>
+        <span class="eyebrow">HOW IT WORKS</span>
+        <h2>How Mister RP works</h2>
+        <p class="section-subtitle">A simple way to find homes, book viewings, and get support.</p>
       </div>
-      <div class="flow-diagram reveal">
-        <svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mister RP conversation flow diagram">
-          <defs>
-            <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-              <path d="M0,0 L8,4 L0,8 Z" fill="var(--slate-light)"></path>
-            </marker>
-          </defs>
+      <div class="workflow-cards reveal">
+        <div class="workflow-card">
+          <div class="icon">🏠</div>
+          <h3>Tell Us What You Need</h3>
+          <p>Describe the property you're looking for, including location, property type, budget, and number of bedrooms.</p>
+        </div>
 
-          <!-- trunk: start -> greeting -> question -->
-          <line x1="500" y1="40" x2="500" y2="70" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="500" y1="112" x2="500" y2="142" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="500" y1="184" x2="500" y2="214" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <div class="workflow-card">
+          <div class="icon">🤖</div>
+          <h3>AI Recommendation</h3>
+          <p>Mister RP searches our property database and recommends homes that best match your preferences.</p>
+        </div>
 
-          <!-- branch spine -->
-          <line x1="500" y1="214" x2="500" y2="240" stroke="var(--slate-light)" stroke-width="1.5"/>
-          <line x1="130" y1="240" x2="870" y2="240" stroke="var(--slate-light)" stroke-width="1.5"/>
-          <line x1="130" y1="240" x2="130" y2="266" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="377" y1="240" x2="377" y2="266" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="623" y1="240" x2="623" y2="266" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="870" y1="240" x2="870" y2="266" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <div class="workflow-card">
+          <div class="icon">📅</div>
+          <h3>Book a Viewing</h3>
+          <p>Found a property you like? Submit a viewing request and our property agent will contact you.</p>
+        </div>
 
-          <!-- column drops: intent -> action -->
-          <line x1="130" y1="308" x2="130" y2="338" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="377" y1="308" x2="377" y2="338" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="623" y1="308" x2="623" y2="338" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="870" y1="308" x2="870" y2="338" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-          <!-- action -> outcome -->
-          <line x1="130" y1="380" x2="130" y2="410" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="377" y1="380" x2="377" y2="410" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-          <line x1="623" y1="380" x2="623" y2="410" stroke="var(--slate-light)" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-          <!-- Start -->
-          <rect x="450" y="14" width="100" height="26" rx="13" fill="var(--ink)"></rect>
-          <text x="500" y="31" text-anchor="middle" class="flow-txt-inv">Start</text>
-
-          <!-- Greeting -->
-          <rect x="415" y="72" width="170" height="40" rx="6" fill="var(--white)" stroke="var(--line)"></rect>
-          <text x="500" y="97" text-anchor="middle" class="flow-txt">Greeting</text>
-
-          <!-- Question -->
-          <rect x="330" y="144" width="340" height="40" rx="6" fill="var(--white)" stroke="var(--line)"></rect>
-          <text x="500" y="169" text-anchor="middle" class="flow-txt">"What can I help you with?"</text>
-
-          <!-- Intent row -->
-          <rect x="65" y="266" width="130" height="42" rx="6" fill="var(--ink)"></rect>
-          <text x="130" y="292" text-anchor="middle" class="flow-txt-inv flow-bold">Browse</text>
-
-          <rect x="312" y="266" width="130" height="42" rx="6" fill="var(--ink)"></rect>
-          <text x="377" y="292" text-anchor="middle" class="flow-txt-inv flow-bold">Property Info</text>
-
-          <rect x="558" y="266" width="130" height="42" rx="6" fill="var(--ink)"></rect>
-          <text x="623" y="292" text-anchor="middle" class="flow-txt-inv flow-bold">Book Viewing</text>
-
-          <rect x="805" y="266" width="130" height="42" rx="6" fill="var(--ink)"></rect>
-          <text x="870" y="292" text-anchor="middle" class="flow-txt-inv flow-bold">Help</text>
-
-          <!-- Action row -->
-          <rect x="65" y="338" width="130" height="42" rx="6" fill="var(--white)" stroke="var(--brass)" stroke-width="1.5"></rect>
-          <text x="130" y="364" text-anchor="middle" class="flow-txt">List homes</text>
-
-          <rect x="312" y="338" width="130" height="42" rx="6" fill="var(--white)" stroke="var(--brass)" stroke-width="1.5"></rect>
-          <text x="377" y="364" text-anchor="middle" class="flow-txt">Show details</text>
-
-          <rect x="558" y="338" width="130" height="42" rx="6" fill="var(--white)" stroke="var(--brass)" stroke-width="1.5"></rect>
-          <text x="623" y="364" text-anchor="middle" class="flow-txt">Google Form</text>
-
-          <rect x="805" y="338" width="130" height="42" rx="6" fill="var(--white)" stroke="var(--line)"></rect>
-          <text x="870" y="358" text-anchor="middle" class="flow-txt flow-small">Live agent</text>
-          <text x="870" y="372" text-anchor="middle" class="flow-txt flow-small">hand-off</text>
-
-          <!-- Outcome row -->
-          <rect x="65" y="410" width="130" height="42" rx="6" fill="var(--paper-raise)"></rect>
-          <text x="130" y="436" text-anchor="middle" class="flow-txt flow-small">Ask filters</text>
-
-          <rect x="312" y="410" width="130" height="42" rx="6" fill="var(--paper-raise)"></rect>
-          <text x="377" y="431" text-anchor="middle" class="flow-txt flow-small">More</text>
-          <text x="377" y="445" text-anchor="middle" class="flow-txt flow-small">questions</text>
-
-          <rect x="558" y="410" width="130" height="42" rx="6" fill="var(--paper-raise)"></rect>
-          <text x="623" y="431" text-anchor="middle" class="flow-txt flow-small">AI scores</text>
-          <text x="623" y="445" text-anchor="middle" class="flow-txt flow-small">the lead</text>
-
-          <style>
-            .flow-txt{ font-family: var(--sans); font-size: 15px; fill: var(--ink); font-weight: 500; }
-            .flow-txt-inv{ font-family: var(--sans); font-size: 15px; fill: var(--white); font-weight: 500; }
-            .flow-bold{ font-weight: 600; }
-            .flow-small{ font-size: 13px; fill: var(--slate); font-weight: 500; }
-          </style>
-        </svg>
+        <div class="workflow-card">
+          <div class="icon">💬</div>
+          <h3>Help &amp; Support</h3>
+          <p>Need assistance? Submit a support request and one of our property agents will get back to you.</p>
+        </div>
       </div>
-      <p class="flow-caption reveal">Browse and Property Info both call the live HDB/URA data layer. Book Viewing hands off to a Google Form, then an AI lead-scoring step flags it for the team.</p>
     </div>
   </section>
 
