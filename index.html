@@ -93,6 +93,14 @@
     display:inline-block;
   }
   .btn-cta:hover{ background: var(--ink-soft); transform: translateY(-1px); }
+
+  /* Container that places an icon beside the CTA button */
+  .cta-with-icon{ display:inline-flex; align-items:center; gap:12px; }
+  .icon-outside{ width: 28px; height: 28px; object-fit: cover; border-radius: 6px; display:block; flex-shrink:0; }
+
+  /* kept for compatibility with previous edits */
+  .btn-with-icon{ display:inline-flex; align-items:center; gap: 10px; }
+  .btn-icon{ width: 18px; height: 18px; object-fit: cover; border-radius: 3px; display:block; flex-shrink: 0; }
   .nav-toggle{ display:none; background:none; border:none; cursor:pointer; }
 
   @media (max-width: 860px){
@@ -115,7 +123,8 @@
   .hero-ctas{ display:flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
   .btn-ghost{
     font-size: 0.92rem; font-weight:600; text-decoration:none; color: var(--ink);
-    border: 1px solid var(--line); padding: 12px 22px; border-radius: 4px;
+    border: 1px solid var(--slate-light); padding: 12px 22px; border-radius: 4px;
+    background: var(--paper-raise);
     transition: border-color 0.18s ease, background 0.18s ease;
   }
   .btn-ghost:hover{ border-color: var(--ink); background: rgba(11,30,51,0.03); }
@@ -296,7 +305,10 @@
       <a href="#data">Data &amp; trust</a>
     </nav>
     <!-- Swap the href below for your actual Telegram bot link, e.g. https://t.me/YourBotUsername -->
-    <a href="https://t.me/rpva_bot" class="btn-cta">Chat on Telegram</a>
+    <div class="cta-with-icon">
+      <img src="assets/telegram_icon.jpg" alt="Telegram" class="icon-outside" aria-hidden="true">
+      <a href="https://t.me/rpva_bot" class="btn-cta">Chat on Telegram</a>
+    </div>
   </div>
 </header>
 
@@ -529,7 +541,10 @@
     <h2 style="margin-top:16px;">Ask Mister RP a real property question.</h2>
     <p>No more guessing. No more open tabs. Just ask Mister RP — it's live on Telegram right now.</p>
     <div class="hero-ctas">
-      <a href="https://t.me/rpva_bot" class="btn-primary">Chat on Telegram</a>
+      <div class="cta-with-icon">
+        <img src="assets/telegram_icon.jpg" alt="Telegram" class="icon-outside" aria-hidden="true">
+        <a href="https://t.me/rpva_bot" class="btn-primary">Chat on Telegram</a>
+      </div>
       <a href="https://github.com/your-team/Mister RP" class="btn-ghost">View the source</a>
     </div>
   </section>
