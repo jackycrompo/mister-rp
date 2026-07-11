@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#073f3c">
+  <meta name="description" content="Ask Mister RP about HDB resale prices and Singapore private property data. Get clear answers from official HDB and URA sources on Telegram.">
+  <title>Mister RP | Singapore property answers on Telegram</title>
+  <style>
+    :root {
+      --forest: #073f3c;
+      --forest-dark: #052d2b;
+      --teal: #087c75;
+      --mint: #dff3ed;
+      --yellow: #f7c84b;
+      --coral: #eb624b;
+      --paper: #f7f7f2;
+      --white: #fff;
+      --ink: #122523;
+      --muted: #5d6c69;
+      --line: #ced8d5;
+      --sans: Inter, "Segoe UI", Arial, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
+    .skip-link { position: fixed; top: 10px; left: 10px; z-index: 100; padding: 10px 14px; background: var(--white); color: var(--forest); transform: translateY(-160%); }
+    .skip-link:focus { transform: none; }
+    .wrap { width: min(1160px, calc(100% - 48px)); margin-inline: auto; }
+    .eyebrow { margin: 0 0 14px; color: var(--teal); font: 700 .74rem/1.2 var(--mono); text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2 { font-family: var(--serif); font-weight: 400; line-height: 1.03; }
+    h2 { max-width: 16ch; margin-bottom: 18px; font-size: clamp(2rem, 4vw, 3.5rem); }
+    h3 { margin-bottom: 8px; font-size: 1rem; line-height: 1.3; }
+    .lede { max-width: 58ch; color: var(--muted); font-size: 1.05rem; }
+    .button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 10px; padding: 11px 18px; border: 1px solid transparent; border-radius: 6px; font-size: .94rem; font-weight: 700; text-decoration: none; transition: transform .18s ease, background .18s ease, border-color .18s ease; }
+    .button:hover { transform: translateY(-2px); }
+    .button-primary { background: var(--yellow); color: var(--forest-dark); }
+    .button-primary:hover { background: #ffd465; }
+    .button-secondary { border-color: rgba(255,255,255,.45); color: var(--white); }
+    .button-secondary:hover { border-color: var(--white); background: rgba(255,255,255,.08); }
+    .telegram-mark { width: 20px; height: 20px; border-radius: 4px; }
+
+    .site-header { position: absolute; inset: 0 0 auto; z-index: 20; color: var(--white); }
+    .nav-inner { display: flex; height: 76px; align-items: center; justify-content: space-between; gap: 28px; border-bottom: 1px solid rgba(255,255,255,.24); }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 1.25rem; font-weight: 700; text-decoration: none; }
+    .brand img { width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.3); border-radius: 6px; object-fit: cover; }
+    .nav-links { display: flex; align-items: center; gap: 28px; margin-left: auto; }
+    .nav-links a { color: rgba(255,255,255,.82); font-size: .88rem; font-weight: 600; text-decoration: none; }
+    .nav-links a:hover { color: var(--white); }
+
+    .hero { position: relative; min-height: min(790px, 92svh); overflow: hidden; background: var(--forest); color: var(--white); }
+    .hero::before { content: ""; position: absolute; inset: 0; background: url("assets/background.jpg") center / cover no-repeat; transform: scale(1.03); }
+    .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,45,43,.96) 0%, rgba(5,45,43,.86) 43%, rgba(5,45,43,.3) 76%, rgba(5,45,43,.12) 100%); }
+    .hero-inner { position: relative; z-index: 2; display: grid; min-height: min(790px, 92svh); align-items: center; padding-top: 92px; padding-bottom: 52px; }
+    .hero-copy { width: min(680px, 68%); }
+    .hero .eyebrow { color: var(--yellow); }
+    .hero h1 { max-width: 11ch; margin-bottom: 24px; font-size: clamp(3.2rem, 7vw, 6.8rem); }
+    .hero h1 span { color: var(--yellow); }
+    .hero .lede { max-width: 52ch; margin-bottom: 30px; color: rgba(255,255,255,.82); font-size: clamp(1rem, 1.5vw, 1.18rem); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .hero-proof { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 34px 0 0; padding: 18px 0 0; border-top: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.72); font-size: .8rem; }
+    .hero-proof span::before { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 9px 1px 0; border-radius: 50%; background: var(--yellow); }
+
+    .ticker-band { position: relative; overflow: hidden; background: var(--forest-dark); border-top: 1px solid rgba(255,255,255,.1); color: var(--white); }
+    .ticker-band::before, .ticker-band::after { content: ""; position: absolute; z-index: 2; top: 0; bottom: 0; width: 54px; pointer-events: none; }
+    .ticker-band::before { left: 0; background: linear-gradient(90deg, var(--forest-dark), transparent); }
+    .ticker-band::after { right: 0; background: linear-gradient(270deg, var(--forest-dark), transparent); }
+    .ticker-track { display: flex; width: max-content; animation: ticker-scroll 48s linear infinite; will-change: transform; }
+    @keyframes ticker-scroll { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+    .ticker-item { display: flex; align-items: center; gap: 10px; padding: 14px 26px; border-right: 1px solid rgba(255,255,255,.12); font: .78rem/1.4 var(--mono); white-space: nowrap; }
+    .ticker-item .loc { color: var(--white); font-weight: 700; }
+    .ticker-item .up { color: #7fe0b5; animation: market-pulse 2.8s ease-in-out infinite; }
+    .ticker-item .down { color: #ff9a8d; animation: market-pulse 2.8s ease-in-out infinite; }
+    @keyframes market-pulse { 0%, 100% { opacity: .72; } 50% { opacity: 1; } }
+    .ticker-note { margin: 0; padding: 9px 24px; background: #e8efec; color: var(--muted); text-align: center; font: .68rem/1.5 var(--mono); }
+    .ticker-band:hover .ticker-track { animation-play-state: paused; }
+
+    .section { padding: 108px 0; }
+    .section-intro { display: flex; align-items: end; justify-content: space-between; gap: 48px; margin-bottom: 50px; }
+    .section-intro > p { max-width: 48ch; margin-bottom: 7px; color: var(--muted); }
+    .prompts { background: var(--white); }
+    .prompt-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+    .prompt { min-height: 224px; padding: 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-decoration: none; transition: background .18s ease, color .18s ease; }
+    .prompt:hover { background: var(--mint); }
+    .prompt-num { display: block; margin-bottom: 42px; color: var(--teal); font: 700 .72rem/1 var(--mono); }
+    .prompt p { max-width: 22ch; margin-bottom: 20px; font: 400 1.36rem/1.25 var(--serif); }
+    .prompt-link { color: var(--teal); font-size: .82rem; font-weight: 700; }
+
+    .answer-section { background: var(--mint); }
+    .answer-layout { display: grid; grid-template-columns: .8fr 1.2fr; align-items: center; gap: clamp(48px, 8vw, 110px); }
+    .answer-copy ul { display: grid; gap: 18px; margin: 30px 0 0; padding: 0; list-style: none; }
+    .answer-copy li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; color: var(--muted); }
+    .answer-copy li span { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--teal); border-radius: 50%; color: var(--teal); font: 700 .7rem var(--mono); }
+    .chat-window { overflow: hidden; border: 1px solid rgba(7,63,60,.15); border-radius: 8px; background: #e9f0ed; box-shadow: 18px 22px 0 rgba(7,63,60,.09); }
+    .chat-top { display: flex; align-items: center; gap: 12px; padding: 15px 18px; background: var(--forest); color: var(--white); }
+    .chat-top img { width: 34px; height: 34px; border-radius: 6px; }
+    .chat-top strong, .chat-top small { display: block; }
+    .chat-top small { color: rgba(255,255,255,.6); }
+    .messages { display: grid; gap: 14px; padding: 24px; }
+    .bubble { width: fit-content; max-width: 88%; margin: 0; padding: 12px 15px; border-radius: 6px; background: var(--white); box-shadow: 0 1px 2px rgba(5,45,43,.08); font-size: .88rem; }
+    .bubble.user { margin-left: auto; background: #d1f2df; }
+    .bubble strong { color: var(--forest); }
+    .comps { margin: 8px 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); color: var(--muted); font: .75rem/1.7 var(--mono); }
+
+    .how-section { background: var(--forest); color: var(--white); }
+    .how-section .eyebrow { color: var(--yellow); }
+    .how-section h2 { color: var(--white); }
+    .how-section .section-intro > p { color: rgba(255,255,255,.68); }
+    .workflow-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .workflow-card { min-height: 250px; padding: 25px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; background: rgba(255,255,255,.06); }
+    .workflow-icon { display: grid; width: 46px; height: 46px; margin-bottom: 42px; place-items: center; border-radius: 8px; background: var(--yellow); color: var(--forest-dark); }
+    .workflow-icon svg { width: 23px; height: 23px; stroke: currentColor; }
+    .workflow-card h3 { font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
+    .workflow-card p { margin-bottom: 0; color: rgba(255,255,255,.66); font-size: .9rem; }
+
+    .demo-layout { display: grid; grid-template-columns: 1fr 1.35fr; gap: 54px; align-items: start; }
+    .demo-copy { position: sticky; top: 32px; }
+    .video-frame { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 8px; background: var(--forest-dark); box-shadow: 18px 18px 0 var(--mint); }
+    .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .data-section { background: #e7e8df; }
+    .source-grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr; margin-top: 52px; border-top: 1px solid #b9c4c0; }
+    .source { padding: 26px 30px 0 0; }
+    .source + .source { padding-left: 30px; border-left: 1px solid #b9c4c0; }
+    .source-tag { color: var(--teal); font: 700 .72rem var(--mono); }
+    .source h3 { margin-top: 22px; font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
+    .source p { color: var(--muted); font-size: .9rem; }
+    .source a { color: var(--teal); font-size: .82rem; font-weight: 700; }
+    .source-note { margin-top: 48px; padding-top: 20px; border-top: 1px solid #b9c4c0; color: var(--muted); font-size: .78rem; }
+
+    .reviews-section { background: var(--white); }
+    .review-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .review-card { overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    .review-media { aspect-ratio: 4 / 3; overflow: hidden; background: #e4e8e5; }
+    .review-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+    .review-card:hover .review-media img { transform: scale(1.035); }
+    .review-body { padding: 22px; }
+    .review-stars { margin-bottom: 12px; color: var(--teal); font-size: .85rem; letter-spacing: 2px; }
+    .review-quote { margin-bottom: 20px; font: 400 1rem/1.45 var(--serif); }
+    .review-name { margin-bottom: 0; color: var(--muted); font: 700 .68rem/1.4 var(--mono); text-transform: uppercase; }
+
+    .final-cta { position: relative; overflow: hidden; padding: 112px 0; background: var(--coral); color: var(--forest-dark); }
+    .final-cta::after { content: "?"; position: absolute; right: 5vw; bottom: -16vw; color: rgba(255,255,255,.15); font: 400 min(42vw, 560px)/1 var(--serif); pointer-events: none; }
+    .final-cta h2 { position: relative; z-index: 1; max-width: 14ch; font-size: clamp(2.6rem, 6vw, 5.8rem); }
+    .final-cta p { position: relative; z-index: 1; max-width: 47ch; margin-bottom: 28px; }
+    .final-cta .button { position: relative; z-index: 1; background: var(--forest-dark); color: var(--white); }
+    footer { background: var(--forest-dark); color: rgba(255,255,255,.62); }
+    .footer-inner { display: flex; justify-content: space-between; gap: 28px; padding-top: 30px; padding-bottom: 30px; font-size: .76rem; }
+    .footer-inner a { color: var(--white); }
+
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; transition-delay: var(--delay, 0ms); }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 880px) {
+      .nav-links { display: none; }
+      .hero-copy { width: 76%; }
+      .prompt-grid { grid-template-columns: 1fr; }
+      .prompt { min-height: 0; }
+      .prompt-num { margin-bottom: 24px; }
+      .answer-layout, .demo-layout { grid-template-columns: 1fr; }
+      .demo-copy { position: static; }
+      .workflow-grid, .review-grid { grid-template-columns: repeat(2, 1fr); }
+      .source-grid { grid-template-columns: 1fr; }
+      .source, .source + .source { padding: 28px 0; border-right: 0; border-left: 0; border-bottom: 1px solid rgba(255,255,255,.22); }
+      .source, .source + .source { border-bottom-color: #b9c4c0; }
+    }
+
+    @media (max-width: 600px) {
+      .wrap { width: min(100% - 32px, 1160px); }
+      .nav-inner { height: 68px; }
+      .site-header .button { min-height: 40px; padding: 8px 11px; font-size: .78rem; }
+      .hero { min-height: 760px; }
+      .hero::before { background-position: 67% center; }
+      .hero::after { background: linear-gradient(90deg, rgba(5,45,43,.96), rgba(5,45,43,.74)); }
+      .hero-inner { min-height: 760px; align-items: end; padding-bottom: 48px; }
+      .hero-copy { width: 100%; }
+      .hero h1 { font-size: clamp(3rem, 15vw, 4.6rem); }
+      .hero-actions .button { width: 100%; }
+      .hero-proof { gap: 8px; }
+      .hero-proof span { width: 100%; }
+      .section { padding: 78px 0; }
+      .section-intro { display: block; margin-bottom: 34px; }
+      .prompt { padding: 24px; }
+      .chat-window { box-shadow: 9px 11px 0 rgba(7,63,60,.09); }
+      .messages { padding: 16px; }
+      .video-frame { box-shadow: 8px 9px 0 var(--mint); }
+      .workflow-grid, .review-grid { grid-template-columns: 1fr; }
+      .workflow-card { min-height: 0; }
+      .workflow-icon { margin-bottom: 28px; }
+      .footer-inner { display: block; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Mister RP home">
+        <img src="assets/icon.png" alt="" width="30" height="30">
+        <span>Mister RP</span>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#ask">What to ask</a>
+        <a href="#how">How it works</a>
+        <a href="#data">The data</a>
+        <a href="#reviews">Reviews</a>
+      </nav>
+      <a class="button button-primary" href="https://t.me/rpva_bot" aria-label="Open Mister RP in Telegram">
+        <img class="telegram-mark" src="assets/telegram_icon.jpg" alt="" width="20" height="20">
+        Open Telegram
+      </a>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="hero" id="top">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Singapore property answers, on demand</p>
+          <h1>Know the price <span>before</span> the pitch.</h1>
+          <p class="lede">Ask Mister RP about an HDB flat or private property in plain English. Get a clear answer grounded in official HDB and URA market data, directly in Telegram.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://t.me/rpva_bot">
+              <img class="telegram-mark" src="assets/telegram_icon.jpg" alt="" width="20" height="20">
+              Ask Mister RP
+            </a>
+            <a class="button button-secondary" href="#ask">See example questions</a>
+          </div>
+          <p class="hero-proof" aria-label="Product highlights">
+            <span>HDB resale transactions</span>
+            <span>URA private market index</span>
+            <span>No new app to install</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker-band" aria-label="Latest property market figures">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+    <p class="ticker-note" id="tickerNote" aria-live="polite">Loading current figures from HDB and URA data services...</p>
+
+    <section class="section prompts" id="ask">
+      <div class="wrap">
+        <div class="section-intro reveal">
+          <div>
+            <p class="eyebrow">Start with a real question</p>
+            <h2>Less searching. More asking.</h2>
+          </div>
+          <p>You do not need to learn a property portal. Tell Mister RP the town, flat type, price or project you are considering.</p>
+        </div>
+        <div class="prompt-grid reveal">
+          <a class="prompt" href="https://t.me/rpva_bot">
+            <span class="prompt-num">01 / HDB</span>
+            <p>“Is $650k fair for a 4-room flat in Tampines?”</p>
+            <span class="prompt-link">Ask on Telegram &rarr;</span>
+          </a>
+          <a class="prompt" href="https://t.me/rpva_bot">
+            <span class="prompt-num">02 / COMPARE</span>
+            <p>“How does Bishan compare with Ang Mo Kio?”</p>
+            <span class="prompt-link">Ask on Telegram &rarr;</span>
+          </a>
+          <a class="prompt" href="https://t.me/rpva_bot">
+            <span class="prompt-num">03 / PRIVATE</span>
+            <p>“What is happening to private home prices?”</p>
+            <span class="prompt-link">Ask on Telegram &rarr;</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section answer-section" id="answer">
+      <div class="wrap answer-layout">
+        <div class="answer-copy reveal">
+          <p class="eyebrow">What you get back</p>
+          <h2>An answer you can check.</h2>
+          <p class="lede">Mister RP gives you the useful number, the context around it, and the source behind it.</p>
+          <ul>
+            <li><span>1</span><div><strong>A direct answer</strong><br>Plain language before property jargon.</div></li>
+            <li><span>2</span><div><strong>Comparable evidence</strong><br>Relevant recent transactions, not asking prices.</div></li>
+            <li><span>3</span><div><strong>Clear limits</strong><br>Data guidance, not financial or legal advice.</div></li>
+          </ul>
+        </div>
+        <div class="chat-window reveal" aria-label="Example conversation with Mister RP">
+          <div class="chat-top">
+            <img src="assets/icon.png" alt="" width="34" height="34">
+            <div><strong>Mister RP</strong><small>Telegram bot</small></div>
+          </div>
+          <div class="messages">
+            <p class="bubble user">Hi, I'm looking for a home in Tampines under $1 million, preferably near an MRT station. What can you recommend?</p>
+            <div class="bubble"><strong>Here are three places in Tampines to start with:</strong>
+              <p class="comps">Tampines Street 21 &middot; 4-room HDB<br>Near Tampines MRT<br><br>Tampines Street 45 &middot; 4-room HDB<br>Near Tampines East MRT<br><br>Tampines Avenue 5 &middot; 5-room HDB<br>Near Tampines MRT</p>
+              These match your location and budget filters. Would you like me to narrow them by flat size or remaining lease?
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section how-section" id="how">
+      <div class="wrap">
+        <div class="section-intro reveal">
+          <div><p class="eyebrow">How it works</p><h2>Finding a home starts with one message.</h2></div>
+          <p>No forms or property filters to learn. Tell Mister RP what matters, then refine the results in conversation.</p>
+        </div>
+        <div class="workflow-grid">
+          <article class="workflow-card reveal" style="--delay:0ms"><div class="workflow-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8M8 13h5"/></svg></div><h3>Tell us what you need</h3><p>Share your preferred location, budget, property type and anything else that matters to you.</p></article>
+          <article class="workflow-card reveal" style="--delay:80ms"><div class="workflow-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M11 8v6M8 11h6"/></svg></div><h3>Get matching options</h3><p>Mister RP checks relevant property data and returns useful places that fit your request.</p></article>
+          <article class="workflow-card reveal" style="--delay:160ms"><div class="workflow-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7v9H3z"/><path d="M9 20v-6h6v6"/></svg></div><h3>Review your choices</h3><p>Compare locations, flat types and market context without opening another property portal.</p></article>
+          <article class="workflow-card reveal" style="--delay:240ms"><div class="workflow-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a10 10 0 1 0-10-10"/><path d="M9 9a3 3 0 1 1 5 2c-2 1-2 2-2 3M12 18h.01"/></svg></div><h3>Ask a follow-up</h3><p>Narrow the search by MRT access, flat size, lease or another detail in the same conversation.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
+      <div class="wrap demo-layout">
+        <div class="demo-copy reveal">
+          <p class="eyebrow">See Mister RP in action</p>
+          <h2>A property research assistant that lives where you already chat.</h2>
+          <p class="lede">Watch the short walkthrough, then open the Telegram bot and try your own property question.</p>
+          <a class="button" style="background:var(--forest);color:var(--white)" href="https://t.me/rpva_bot">Try it on Telegram</a>
+        </div>
+        <div class="video-frame reveal">
+          <iframe src="https://share.synthesia.io/embeds/videos/9cceea12-f032-40b8-9ae8-0e2e93a48119" loading="lazy" title="Mister RP product walkthrough" allow="encrypted-media; fullscreen" allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>
+
+    <section class="section data-section" id="data">
+      <div class="wrap reveal">
+        <p class="eyebrow">Data and trust</p>
+        <h2>Official records. Honest limits.</h2>
+        <p class="lede">The market ticker and Mister RP's context are built around public Singapore government datasets, not scraped listing prices.</p>
+        <div class="source-grid">
+          <article class="source"><span class="source-tag">HDB / RESALE</span><h3>Completed resale transactions</h3><p>Prices by month, town, flat type, block and other property attributes.</p><a href="https://data.gov.sg/collections/189/view" target="_blank" rel="noopener">View HDB source &rarr;</a></article>
+          <article class="source"><span class="source-tag">URA / PRIVATE</span><h3>Private property price index</h3><p>A broad quarterly signal for Singapore's private residential market.</p><a href="https://www.ura.gov.sg/Corporate/Property/Property-Data" target="_blank" rel="noopener">View URA source &rarr;</a></article>
+          <article class="source"><span class="source-tag">DESIGNED TO DEGRADE WELL</span><h3>Visible data status</h3><p>If a live service is unavailable, the ticker clearly labels its figures as samples instead of presenting them as live.</p></article>
+        </div>
+        <p class="source-note">Mister RP is an AI research assistant, not a licensed estate agent, valuer, financial adviser or legal adviser. Dataset publication schedules create a natural delay. Verify material facts and decisions with the relevant authority or a registered professional before transacting.</p>
+      </div>
+    </section>
+
+    <section class="section reviews-section" id="reviews">
+      <div class="wrap">
+        <div class="section-intro reveal">
+          <div><p class="eyebrow">Customer reviews</p><h2>Property questions, answered clearly.</h2></div>
+          <p>Feedback from buyers who used Mister RP to understand the market before making their next move.</p>
+        </div>
+        <div class="review-grid">
+          <article class="review-card reveal" style="--delay:0ms"><div class="review-media"><img src="assets/social/post-1.jpg" alt="Modern property meeting room" loading="lazy"></div><div class="review-body"><div class="review-stars" aria-label="Rated 5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="review-quote">“Compared four condos in one evening instead of waiting on agents to call back. The numbers matched URA's data exactly.”</p><p class="review-name">T. Lim &middot; Private property buyer</p></div></article>
+          <article class="review-card reveal" style="--delay:80ms"><div class="review-media"><img src="assets/social/post-2.jpg" alt="New homeowners completing a property handover" loading="lazy"></div><div class="review-body"><div class="review-stars" aria-label="Rated 5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="review-quote">“First time buying and I had no idea what a fair resale price looked like. Mister RP made it easy to understand.”</p><p class="review-name">R. Kumar &middot; First-time buyer</p></div></article>
+          <article class="review-card reveal" style="--delay:160ms"><div class="review-media"><img src="assets/social/post-3.jpg" alt="Property consultation overlooking the city" loading="lazy"></div><div class="review-body"><div class="review-stars" aria-label="Rated 4 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div><p class="review-quote">“Asked about Bishan resale flats at 11pm and got a straight answer without waiting for a call back.”</p><p class="review-name">S. Wong &middot; HDB upgrader</p></div></article>
+          <article class="review-card reveal" style="--delay:240ms"><div class="review-media"><img src="assets/social/post-4.jpg" alt="Keys being handed to new homeowners" loading="lazy"></div><div class="review-body"><div class="review-stars" aria-label="Rated 5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="review-quote">“Used it to double-check my agent's asking price before signing. Glad I did.”</p><p class="review-name">A. Farid &middot; HDB buyer</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="wrap reveal">
+        <p class="eyebrow" style="color:var(--forest-dark)">Your turn</p>
+        <h2>What property question is on your mind?</h2>
+        <p>Bring Mister RP a real HDB or private property question. It is ready on Telegram.</p>
+        <a class="button" href="https://t.me/rpva_bot">
+          <img class="telegram-mark" src="assets/telegram_icon.jpg" alt="" width="20" height="20">
+          Chat with Mister RP
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>&copy; 2026 Mister RP. Singapore property research, made conversational.</span>
+      <span>Data references: <a href="https://data.gov.sg/" target="_blank" rel="noopener">data.gov.sg</a> and <a href="https://www.ura.gov.sg/" target="_blank" rel="noopener">URA</a></span>
+    </div>
+  </footer>
+
+  <script src="ticker.js" defer></script>
+</body>
+</html>
