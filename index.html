@@ -133,6 +133,32 @@
   /* ---------- HERO ---------- */
   .hero{ padding: 112px 0 64px; }
   .hero .eyebrow{ margin-bottom: 20px; display:block; }
+  .hero-copy{
+    position: relative;
+    overflow: hidden;
+    border-radius: 32px;
+    padding: 3rem 2.5rem 2.2rem;
+    background: rgba(247, 243, 236, 0.94);
+    box-shadow: 0 30px 60px rgba(15, 27, 45, 0.08);
+    margin-bottom: 32px;
+  }
+  .hero-copy::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("assets/background.jpg") center/cover no-repeat;
+    opacity: 0.52;
+    filter: saturate(0.65) blur(0.7px) brightness(0.72);
+    z-index: 0;
+  }
+  .hero-copy::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15,27,45,0.24), rgba(247,243,236,0.74));
+    z-index: 1;
+  }
+  .hero-copy > *{ position: relative; z-index: 2; }
   .hero h1{
     font-size: clamp(2.3rem, 4.6vw, 3.8rem);
     max-width: 13ch;
@@ -419,8 +445,10 @@
 
   <section class="hero wrap">
     <span class="eyebrow">AI PROPERTY AGENT · BUILT ON HDB &amp; URA DATA</span>
-    <h1>Ask a straight question about a flat or a condo. <em>Get a straight answer.</em></h1>
-    <p class="lede">Mister RP reads live HDB resale and URA private property data so you don't have to dig through portals and PDFs. Tell it what you're looking at — it tells you what the numbers actually say.</p>
+    <div class="hero-copy">
+      <h1>Ask a straight question about a flat or a condo. <em>Get a straight answer.</em></h1>
+      <p class="lede">Mister RP reads live HDB resale and URA private property data so you don't have to dig through portals and PDFs. Tell it what you're looking at — it tells you what the numbers actually say.</p>
+    </div>
     <div class="hero-ctas">
       <a href="https://t.me/rpva_bot" class="btn-primary">Chat with Mister RP</a>
       <a href="#how-it-works" class="btn-ghost">See how it works</a>
