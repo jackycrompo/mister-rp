@@ -74,12 +74,15 @@
     .ticker-band::before { left: 0; background: linear-gradient(90deg, var(--forest-dark), transparent); }
     .ticker-band::after { right: 0; background: linear-gradient(270deg, var(--forest-dark), transparent); }
     .ticker-track { display: flex; width: max-content; animation: ticker-scroll 48s linear infinite; will-change: transform; }
-    @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @keyframes ticker-scroll { from { transform: translateX(-50%); } to { transform: translateX(0); } }
     .ticker-item { display: flex; align-items: center; gap: 10px; padding: 14px 26px; border-right: 1px solid rgba(255,255,255,.12); font: .78rem/1.4 var(--mono); white-space: nowrap; }
     .ticker-item .loc { color: var(--white); font-weight: 700; }
     .ticker-item .up { color: #7fe0b5; animation: market-pulse 2.8s ease-in-out infinite; }
     .ticker-item .down { color: #ff9a8d; animation: market-pulse 2.8s ease-in-out infinite; }
     @keyframes market-pulse { 0%, 100% { opacity: .72; } 50% { opacity: 1; } }
+    .ticker-item .val { transition: color .9s ease; }
+    .ticker-item .val.tick-flash-up { color: #7fe0b5; transition: color 0s; }
+    .ticker-item .val.tick-flash-down { color: #ff9a8d; transition: color 0s; }
     .ticker-note { margin: 0; padding: 9px 24px; background: #e8efec; color: var(--muted); text-align: center; font: .68rem/1.5 var(--mono); }
     .ticker-band:hover .ticker-track { animation-play-state: paused; }
 
@@ -197,12 +200,6 @@
       .workflow-icon { margin-bottom: 28px; }
       .footer-inner { display: block; }
     }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
-      .reveal { opacity: 1; transform: none; }
-    }
   </style>
 </head>
 <body>
@@ -220,7 +217,7 @@
         <a href="#data">The data</a>
         <a href="#reviews">Reviews</a>
       </nav>
-      <a class="button button-primary" href="https://t.me/rpva_bot" target="_blank" rel="noopener noreferrer" aria-label="Open Mister RP in Telegram">
+      <a class="button button-primary" href="https://t.me/rpva_bot" aria-label="Open Mister RP in Telegram">
         <img class="telegram-mark" src="assets/telegram_icon.jpg" alt="" width="20" height="20">
         Open Telegram
       </a>
@@ -233,11 +230,11 @@
         <div class="hero-copy">
           <p class="eyebrow">Singapore property answers, on demand</p>
           <h1>Know the price <span>before</span> the pitch.</h1>
-          <p class="lede">Ask Mister RP Virtual Assistant about an HDB flat or private property in plain English. Get a clear answer grounded in official HDB and URA market data, directly in Telegram.</p>
+          <p class="lede">Ask Mister RP about an HDB flat or private property in plain English. Get a clear answer grounded in official HDB and URA market data, directly in Telegram.</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="https://t.me/rpva_bot" target="_blank" rel="noopener noreferrer">
+            <a class="button button-primary" href="https://t.me/rpva_bot">
               <img class="telegram-mark" src="assets/telegram_icon.jpg" alt="" width="20" height="20">
-              Ask Mister RP Virtual Assistant
+              Ask Mister RP
             </a>
             <a class="button button-secondary" href="#ask">See example questions</a>
           </div>
@@ -265,17 +262,17 @@
           <p>You do not need to learn a property portal. Tell Mister RP the town, flat type, price or project you are considering.</p>
         </div>
         <div class="prompt-grid reveal">
-          <a class="prompt" href="https://t.me/rpva_bot" target="_blank" rel="noopener noreferrer">
+          <a class="prompt" href="https://t.me/rpva_bot">
             <span class="prompt-num">01 / HDB</span>
             <p>“Is $650k fair for a 4-room flat in Tampines?”</p>
             <span class="prompt-link">Ask on Telegram &rarr;</span>
           </a>
-          <a class="prompt" href="https://t.me/rpva_bot" target="_blank" rel="noopener noreferrer">
+          <a class="prompt" href="https://t.me/rpva_bot">
             <span class="prompt-num">02 / COMPARE</span>
             <p>“How does Bishan compare with Ang Mo Kio?”</p>
             <span class="prompt-link">Ask on Telegram &rarr;</span>
           </a>
-          <a class="prompt" href="https://t.me/rpva_bot" target="_blank" rel="noopener noreferrer">
+          <a class="prompt" href="https://t.me/rpva_bot">
             <span class="prompt-num">03 / PRIVATE</span>
             <p>“What is happening to private home prices?”</p>
             <span class="prompt-link">Ask on Telegram &rarr;</span>
@@ -289,7 +286,7 @@
         <div class="answer-copy reveal">
           <p class="eyebrow">What you get back</p>
           <h2>An answer you can check.</h2>
-          <p class="lede">Mister RP Virtual Assistant gives you the useful number, the context around it, and the source behind it.</p>
+          <p class="lede">Mister RP gives you the useful number, the context around it, and the source behind it.</p>
           <ul>
             <li><span>1</span><div><strong>A direct answer</strong><br>Plain language before property jargon.</div></li>
             <li><span>2</span><div><strong>Comparable evidence</strong><br>Relevant recent transactions, not asking prices.</div></li>
@@ -299,7 +296,7 @@
         <div class="chat-window reveal" aria-label="Example conversation with Mister RP">
           <div class="chat-top">
             <img src="assets/icon.png" alt="" width="34" height="34">
-            <div><strong>Mister RP Virtual Assistant</strong><small>Telegram bot</small></div>
+            <div><strong>Mister RP</strong><small>Telegram bot</small></div>
           </div>
           <div class="messages">
             <p class="bubble user">Hi, I'm looking for a home in Tampines under $1 million, preferably near an MRT station. What can you recommend?</p>
@@ -330,10 +327,10 @@
     <section class="section" id="demo">
       <div class="wrap demo-layout">
         <div class="demo-copy reveal">
-          <p class="eyebrow">See Mister RP Virtual Assistant in action</p>
+          <p class="eyebrow">See Mister RP in action</p>
           <h2>A property research assistant that lives where you already chat.</h2>
           <p class="lede">Watch the short walkthrough, then open the Telegram bot and try your own property question.</p>
-          <a class="button" style="background:var(--forest);color:var(--white)" href="https://t.me/rpva_bot" target="_blank" rel="noopener noreferrer">Try it on Telegram</a>
+          <a class="button" style="background:var(--forest);color:var(--white)" href="https://t.me/rpva_bot">Try it on Telegram</a>
         </div>
         <div class="video-frame reveal">
           <iframe src="https://share.synthesia.io/embeds/videos/9cceea12-f032-40b8-9ae8-0e2e93a48119" loading="lazy" title="Mister RP product walkthrough" allow="encrypted-media; fullscreen" allowfullscreen></iframe>
@@ -375,9 +372,9 @@
         <p class="eyebrow" style="color:var(--forest-dark)">Your turn</p>
         <h2>What property question is on your mind?</h2>
         <p>Bring Mister RP a real HDB or private property question. It is ready on Telegram.</p>
-        <a class="button" href="https://t.me/rpva_bot" target="_blank" rel="noopener noreferrer">
+        <a class="button" href="https://t.me/rpva_bot">
           <img class="telegram-mark" src="assets/telegram_icon.jpg" alt="" width="20" height="20">
-          Chat with Mister RP Virtual Assistant
+          Chat with Mister RP
         </a>
       </div>
     </section>

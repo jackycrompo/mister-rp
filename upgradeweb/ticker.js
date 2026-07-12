@@ -1,35 +1,43 @@
 /* ============================================================================
-   Mister RP — live price ticker
+   Mister RP — live price ticker (merged)
    ----------------------------------------------------------------------------
-   Pulls real figures from Singapore government open data and scrolls them
-   left-to-right. No API key required for anything in this file.
+   Combines two things that used to live in separate files:
 
-   Sources (all via data.gov.sg's keyless datastore_search endpoint):
-     • HDB resale flat prices, Jan-2017 onwards
-       dataset d_8b84c4ee58e3cfc0ece0d773c8ca6abc
-       → real median resale price per town + flat type, and the real
-         month-over-month change.
-     • URA Private Residential Property Price Index (2009-Q1 = 100), quarterly
-       dataset d_97f8a2e995022d311c6c68cfda6d034c
-       → real private-market index level and the real quarter-over-quarter
-         change.
+     1. Real anchors: median HDB resale price per town/flat-type, and the
+        URA Private Residential Property Price Index, both pulled from
+        data.gov.sg's keyless datastore_search endpoint. No API key needed.
+
+     2. Live-feel motion (was main.js): each tick, every displayed price
+        wobbles a little around its real anchor and gently eases back,
+        so the ticker visibly moves instead of sitting static. The %
+        change badge next to each price is NOT touched by this wobble —
+        it always reflects the real reported month-over-month (HDB) or
+        quarter-over-quarter (URA) change, so we never show a fake stat.
+
+   Only one file renders into #tickerTrack now. Do not also load main.js —
+   remove it from index.html and the repo if it's still there, it would
+   fight this file over the same element.
 
    A NOTE ON URA psf DATA
    ----------------------------------------------------------------------------
-   Actual per-transaction private prices (i.e. "$/psf") live in URA's own
-   Data Service (eservice.ura.gov.sg). That API needs a secret AccessKey +
-   a daily Token sent as request headers, so it CANNOT be called from the
-   browser: the key would be exposed to every visitor and the endpoint is not
-   CORS-enabled. If you have a URA key, proxy it from your own backend and
-   fetch that proxy here instead — see the commented stub at the bottom.
+   Actual per-transaction private prices ("$/psf") live in URA's own Data
+   Service (eservice.ura.gov.sg), which needs a secret AccessKey + daily
+   Token as headers and is not CORS-enabled — it cannot be called from the
+   browser. If you get a URA key, proxy it from your own backend. Until
+   then, the keyless Price Index above is the honest live signal.
 
-   RESILIENCE
+   ON THE RED CONSOLE ERRORS
    ----------------------------------------------------------------------------
-   The ticker paints instantly with the last-known sample values so it is
-   never empty, then quietly swaps in live data when it arrives. If the network
-   fails, CORS blocks the request, or you hit the rate limit, it simply keeps
-   the sample values. Results are cached in localStorage for a few hours so
-   repeat visits don't re-hit the API (HDB data only changes monthly).
+   If data.gov.sg's endpoint doesn't send CORS headers for browser-origin
+   requests, the fetch below will fail and Chrome/Firefox will print a red
+   network error in the console — that's the browser reporting it, not an
+   uncaught exception in this file. It's already caught below, and the
+   ticker falls back to sample figures with a note saying so. If you want
+   those console errors gone entirely (and real numbers even when the
+   browser can't reach data.gov.sg directly), the fix is to fetch the data
+   server-side on a schedule (a GitHub Action or your n8n workflow) and
+   have this script read a same-origin data.json instead of calling
+   data.gov.sg directly. Ask if you want that wired up.
    ============================================================================ */
 
 (function () {
@@ -42,8 +50,6 @@
     uraPpi:    'd_97f8a2e995022d311c6c68cfda6d034c'
   };
 
-  // HDB entries to show. `town` and `flat_type` must match the dataset's
-  // spelling exactly (towns are UPPERCASE; flat types like "4 ROOM").
   var HDB_ENTRIES = [
     { town: 'TAMPINES',   flat_type: '4 ROOM',    label: 'Tampines · 4-room HDB' },
     { town: 'BISHAN',     flat_type: '5 ROOM',    label: 'Bishan · 5-room HDB' },
@@ -55,23 +61,26 @@
     { town: 'ANG MO KIO', flat_type: 'EXECUTIVE', label: 'Ang Mo Kio · Executive' }
   ];
 
-  // Shown if live data can't be reached — same illustrative values the page
-  // originally shipped with, so nothing ever looks broken.
+  // Used whenever live data can't be reached. `anchor` is numeric so the
+  // wobble animation has something real to nudge around.
   var FALLBACK = [
-    { loc: 'Tampines · 4-room HDB',   val: '$598,000',  delta: '+1.2%', up: true },
-    { loc: 'Bishan · 5-room HDB',     val: '$742,500',  delta: '+0.6%', up: true },
-    { loc: 'Punggol · 4-room HDB',    val: '$521,000',  delta: '+2.1%', up: true },
-    { loc: 'Queenstown · 3-room HDB', val: '$468,000',  delta: '+0.3%', up: true },
-    { loc: 'Sengkang · 4-room HDB',   val: '$545,000',  delta: '+0.8%', up: true },
-    { loc: 'Bedok · 4-room HDB',      val: '$560,000',  delta: '+0.5%', up: true },
-    { loc: 'Woodlands · 5-room HDB',  val: '$612,000',  delta: '+1.5%', up: true },
-    { loc: 'Ang Mo Kio · Executive',  val: '$789,000',  delta: '+0.9%', up: true },
-    { loc: 'Private Residential · URA', val: 'PPI 210.4', delta: '+0.9%', up: true }
+    { loc: 'Tampines · 4-room HDB',    kind: 'money', anchor: 598000, deltaText: '+1.2%', up: true },
+    { loc: 'Bishan · 5-room HDB',      kind: 'money', anchor: 742500, deltaText: '+0.6%', up: true },
+    { loc: 'Punggol · 4-room HDB',     kind: 'money', anchor: 521000, deltaText: '+2.1%', up: true },
+    { loc: 'Queenstown · 3-room HDB',  kind: 'money', anchor: 468000, deltaText: '+0.3%', up: true },
+    { loc: 'Sengkang · 4-room HDB',    kind: 'money', anchor: 545000, deltaText: '+0.8%', up: true },
+    { loc: 'Bedok · 4-room HDB',       kind: 'money', anchor: 560000, deltaText: '+0.5%', up: true },
+    { loc: 'Woodlands · 5-room HDB',   kind: 'money', anchor: 612000, deltaText: '+1.5%', up: true },
+    { loc: 'Ang Mo Kio · Executive',   kind: 'money', anchor: 789000, deltaText: '+0.9%', up: true },
+    { loc: 'Private Residential · URA', kind: 'index', anchor: 210.4, deltaText: '+0.9%', up: true }
   ];
 
-  var CACHE_KEY = 'misterrp_ticker_v1';
+  var CACHE_KEY = 'misterrp_ticker_v2';
   var CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
   var FETCH_TIMEOUT_MS = 9000;
+  var WOBBLE_INTERVAL_MS = 2400;
+
+  var activeItems = []; // whatever is currently on screen (live or fallback), with wobble state
 
   /* ---------- small helpers ---------------------------------------------- */
 
@@ -82,10 +91,17 @@
     return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
   }
 
-  function money(n) {
-    // round to the nearest $500 so the ticker reads cleanly (e.g. $597,500)
-    var rounded = Math.round(n / 500) * 500;
+  function formatMoney(n) {
+    var rounded = Math.round(n / 500) * 500; // nearest $500
     return '$' + rounded.toLocaleString('en-US');
+  }
+
+  function formatIndex(n) {
+    return 'PPI ' + n.toFixed(1);
+  }
+
+  function formatValue(item) {
+    return item.kind === 'index' ? formatIndex(item.wobble) : formatMoney(item.wobble);
   }
 
   function pct(now, prev) {
@@ -103,7 +119,6 @@
     return (names[mi] || parts[1]) + ' ' + parts[0];
   }
 
-  // fetch with a timeout so a hung request can't stall the ticker forever
   function getJSON(url) {
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var t = ctrl ? setTimeout(function () { ctrl.abort(); }, FETCH_TIMEOUT_MS) : null;
@@ -138,7 +153,6 @@
       var rows = (json && json.result && json.result.records) || [];
       if (!rows.length) return null;
 
-      // group resale_price by month
       var byMonth = {};
       rows.forEach(function (r) {
         var m = r.month;
@@ -147,16 +161,14 @@
         (byMonth[m] = byMonth[m] || []).push(price);
       });
 
-      // distinct months, newest first
       var months = Object.keys(byMonth).sort().reverse();
       if (!months.length) return null;
 
-      // pick the newest month with a usable sample, and the previous such month
       function pickFrom(startIdx) {
         for (var i = startIdx; i < months.length; i++) {
           if (byMonth[months[i]].length >= 3) return i;
         }
-        return startIdx < months.length ? startIdx : -1; // fall back to whatever exists
+        return startIdx < months.length ? startIdx : -1;
       }
       var curIdx = pickFrom(0);
       var prevIdx = pickFrom(curIdx + 1);
@@ -167,8 +179,9 @@
 
       return {
         loc: entry.label,
-        val: money(curMedian),
-        delta: mv.delta,
+        kind: 'money',
+        anchor: curMedian,
+        deltaText: mv.delta,
         up: mv.up,
         _month: months[curIdx]
       };
@@ -176,13 +189,11 @@
   }
 
   /* ---------- URA: real private price index + real QoQ change ------------ */
-  // Column names on this dataset aren't guaranteed, so detect them from the
-  // returned schema (a period-like text field + a numeric index field).
 
-  function parseQuarterKey(v) { // "2026-Q1" / "2026 1Q" / "2026Q1" -> 20261
+  function parseQuarterKey(v) {
     var s = String(v);
     var y = s.match(/(19|20)\d{2}/);
-    var q = s.match(/[1-4]/g); // last single digit 1-4 that appears near a Q
+    var q = s.match(/[1-4]/g);
     var qm = s.match(/q\s*([1-4])/i) || s.match(/([1-4])\s*q/i);
     if (!y) return NaN;
     var quarter = qm ? parseInt(qm[1], 10) : (q ? parseInt(q[q.length - 1], 10) : 1);
@@ -190,7 +201,6 @@
   }
 
   function loadUraPpi() {
-    // First pull the schema + a sample to identify the columns.
     return getJSON(buildURL(DATASETS.uraPpi, { limit: 1 })).then(function (meta) {
       var fields = (meta && meta.result && meta.result.fields) || [];
       var sample = (meta && meta.result && meta.result.records && meta.result.records[0]) || {};
@@ -205,17 +215,13 @@
           valueField = f.id;
         }
       });
-      // last-ditch guesses
       if (!periodField && fields[0]) periodField = fields[0].id;
       if (!valueField && fields[1]) valueField = fields[1].id;
       if (!periodField || !valueField) throw new Error('URA PPI: columns not found');
 
-      // Sort the whole series by the detected period, newest first.
       var url = buildURL(DATASETS.uraPpi, { sort: periodField + ' desc', limit: 200 });
       return getJSON(url).then(function (json) {
         var rows = (json && json.result && json.result.records) || [];
-        // Re-sort client-side by a parsed quarter key so we don't depend on the
-        // server's lexical ordering matching chronological order.
         rows = rows
           .map(function (r) {
             return { period: r[periodField], key: parseQuarterKey(r[periodField]), val: parseFloat(r[valueField]) };
@@ -231,8 +237,9 @@
 
         return {
           loc: 'Private Residential · URA',
-          val: 'PPI ' + cur.val.toFixed(1),
-          delta: mv.delta,
+          kind: 'index',
+          anchor: cur.val,
+          deltaText: mv.delta,
           up: mv.up,
           _quarter: qLabel
         };
@@ -240,7 +247,7 @@
     });
   }
 
-  /* ---------- cache ------------------------------------------------------- */
+  /* ---------- cache (stores anchors, not wobble state) --------------------- */
 
   function readCache() {
     try {
@@ -256,24 +263,54 @@
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch (e) {}
   }
 
-  /* ---------- render ----------------------------------------------------- */
+  /* ---------- render + wobble ---------------------------------------------- */
+
+  function itemHTML(item, idx) {
+    return '' +
+      '<div class="ticker-item" data-idx="' + idx + '">' +
+        '<span class="loc">' + item.loc + '</span>' +
+        '<span class="val">' + formatValue(item) + '</span>' +
+        '<span class="' + (item.up ? 'up' : 'down') + '">' +
+          (item.up ? '\u25B2' : '\u25BC') + ' ' + item.deltaText +
+        '</span>' +
+      '</div>';
+  }
 
   function renderTicker(items) {
     var track = document.getElementById('tickerTrack');
     if (!track) return;
-    // Duplicate the list once: the CSS animation translates the track by -50%,
-    // so two identical copies produce a seamless loop for any item count.
-    var html = items.concat(items).map(function (d) {
-      return '' +
-        '<div class="ticker-item">' +
-          '<span class="loc">' + d.loc + '</span>' +
-          '<span>' + d.val + '</span>' +
-          '<span class="' + (d.up ? 'up' : 'down') + '">' +
-            (d.up ? '\u25B2' : '\u25BC') + ' ' + d.delta +
-          '</span>' +
-        '</div>';
-    }).join('');
-    track.innerHTML = html;
+    items.forEach(function (it) { it.wobble = it.anchor; });
+    activeItems = items;
+    var seq = items.concat(items);
+    track.innerHTML = seq.map(function (it, i) { return itemHTML(it, i % items.length); }).join('');
+  }
+
+  // One tick: nudge each item's displayed value with small noise plus a
+  // gentle pull back toward its real anchor, so figures move believably
+  // without drifting away from the real number. The delta badge is left
+  // untouched — it's a real reported stat, not something to fake-animate.
+  function wobbleStep() {
+    activeItems.forEach(function (it, idx) {
+      var prevWobble = it.wobble;
+      var noise = (Math.random() - 0.5) * 0.006;               // ±0.3%
+      var reversion = (it.anchor - it.wobble) / it.anchor * 0.04; // ease back
+      it.wobble = it.wobble * (1 + noise + reversion);
+      var lo = it.anchor * 0.97, hi = it.anchor * 1.03;          // stay within ±3%
+      if (it.wobble < lo) it.wobble = lo;
+      if (it.wobble > hi) it.wobble = hi;
+
+      var tickUp = it.wobble >= prevWobble;
+      var nodes = document.querySelectorAll('.ticker-item[data-idx="' + idx + '"] .val');
+      nodes.forEach(function (valEl) {
+        valEl.textContent = formatValue(it);
+        valEl.classList.remove('tick-flash-up', 'tick-flash-down');
+        void valEl.offsetWidth; // restart the flash
+        valEl.classList.add(tickUp ? 'tick-flash-up' : 'tick-flash-down');
+        setTimeout(function () {
+          valEl.classList.remove('tick-flash-up', 'tick-flash-down');
+        }, 700);
+      });
+    });
   }
 
   function setNote(text) {
@@ -304,14 +341,11 @@
 
     return Promise.all(jobs).then(function (results) {
       var items = results.filter(Boolean);
-      // Require a reasonable amount of real data before replacing the sample,
-      // otherwise keep the fallback so the ticker never looks half-empty.
       return items.length >= 4 ? items : null;
     });
   }
 
   function init() {
-    // 1) Paint immediately so the band is never blank and starts scrolling.
     var cached = readCache();
     if (cached && cached.items && cached.items.length) {
       renderTicker(cached.items);
@@ -321,7 +355,8 @@
       renderTicker(FALLBACK);
     }
 
-    // 2) Fetch live data (skip the network if the cache is still fresh).
+    setInterval(wobbleStep, WOBBLE_INTERVAL_MS);
+
     if (cached) return;
 
     loadLive()
@@ -340,7 +375,7 @@
       });
   }
 
-  /* ---------- scroll-reveal (unchanged, moved out of index.html) ---------- */
+  /* ---------- scroll-reveal ------------------------------------------------ */
 
   function initReveal() {
     var revealEls = document.querySelectorAll('.reveal');
@@ -365,30 +400,7 @@
   }
 
   /* ============================================================================
-     OPTIONAL: real private $/psf via your own URA proxy
-     ----------------------------------------------------------------------------
-     URA's Data Service returns transaction-level private prices (from which you
-     can derive $/psf), but it needs an AccessKey + daily Token as headers and
-     is not CORS-enabled — so it must be called server-side, never here.
-
-     Deploy a tiny backend (e.g. a serverless function) that:
-       1. keeps your URA AccessKey secret,
-       2. once a day fetches a Token:
-            GET https://eservice.ura.gov.sg/uraDataService/insertNewToken/v1
-            header: AccessKey: <your key>
-       3. calls the transactions endpoint with AccessKey + Token:
-            GET https://eservice.ura.gov.sg/uraDataService/invokeUraDS/v1
-                ?service=PMI_Resi_Transaction&batch=1
-       4. returns JSON your page can read from the same origin.
-
-     Then replace loadUraPpi() with a fetch of YOUR proxy, e.g.:
-
-       function loadUraPsf() {
-         return getJSON('/api/ura-transactions').then(function (json) {
-           // aggregate json into { loc, val: '$X,XXX psf', delta, up }
-         });
-       }
-
-     Until then, the keyless URA Price Index above is the honest live signal.
+     OPTIONAL: real private $/psf via your own URA proxy — see note at top
+     of this file for why it can't be called directly from the browser.
      ============================================================================ */
 })();
